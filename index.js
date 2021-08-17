@@ -137,27 +137,33 @@ console.log("Stretch 1", getCountryWins(fifaData, "ITA"));
 Write a function called getGoals() that accepts a parameter `data` and returns the team with the most goals score per appearance (average goals for) in the World Cup finals */
 
 function getGoals(data) {
-    const htn = "Home Team Name";
-    const atn = "Away Team Name";
-    const htg = "Home Team Goals";
-    const atg = "Away Team Goals";
-    const info = getFinals(data);
-    const tag = {}; //Team Average Goals
+    const finalsArray = getFinals(data);
+    const tg = {}; //Team Goals
     const tp = {}; //Team Played
-    for(let i=0;i<info.length;i++){
-        if(!(info[i][htn] in tag)) tag[info[i][htn]]=0;
-        if(!(info[i][atn] in tag)) tag[info[i][atn]]=0;
-        if(!(info[i][htn] in tp)) tp[info[i][htn]]=0;
-        if(!(info[i][atn] in tp)) tp[info[i][atn]]=0;
-        tag[info[i][htn]]= ((tp[info[i][htn]]*tag[info[i][htn]])+info[i][htg])/(tp[info[i][htn]]+1);
-        tag[info[i][atn]]= ((tp[info[i][atn]]*tag[info[i][atn]])+info[i][atg])/(tp[info[i][atn]]+1);
-        tp[info[i][htn]]++;
-        tp[info[i][atn]]++;
-        // console.log(tag[info[i][htn]], ":", tp[info[i][htn]], "  ", tag[info[i][atn]], ":", tp[info[i][atn]]);
-    }
-    // console.log(tag);
+    finalsArray.forEach(item => {
+        let team1 = item["Home Team Name"];
+        let team2 = item["Away Team Name"];
+        let goals1 = item["Home Team Goals"];
+        let goals2 = item["Away Team Goals"];
+        if(!(team1 in tg)) tg[team1]=0;
+        if(!(team2 in tg)) tg[team2]=0;
+        if(!(team1 in tp)) tp[team1]=0;
+        if(!(team2 in tp)) tp[team2]=0;
+        tg[team1]+=goals1;
+        tg[team2]+=goals2;
+        tp[team1]++;
+        tp[team2]++;
+        // console.log(team1, tg[team1], ":", tp[team1], "  ", team2, tg[team2], ":", tp[team2]);
+    });
+    // console.log(tg);
     // console.log(tp);
-    return Object.keys(tag).reduce((acc, key) => {if(tag[acc]>tag[key]) return acc; return key;}, "");
+    const tag = {}; // Team Average Goals
+    for(const [key, value] of Object.entries(tg)){
+        tag[key]=value/tp[key];
+    }
+    const highestValue = Math.max(...Object.values(tag));
+    // console.log(tag, highestValue);
+    return Object.keys(tag).filter(item => tag[item]===highestValue).join(" ");
 }
 
 console.log("Stretch 2:", getGoals(fifaData));
@@ -166,32 +172,39 @@ console.log("Stretch 2:", getGoals(fifaData));
 Write a function called badDefense() that accepts a parameter `data` and calculates the team with the most goals scored against them per appearance (average goals against) in the World Cup finals */
 
 function badDefense(data) {
-    const htn = "Home Team Name";
-    const atn = "Away Team Name";
-    const htg = "Home Team Goals";
-    const atg = "Away Team Goals";
-    const info = getFinals(data);
-    const tag = {}; //Team Average Goals Against Them
+    const finalsArray = getFinals(data);
+    const tg = {}; //Team Goals
     const tp = {}; //Team Played
-    for(let i=0;i<info.length;i++){
-        if(!(info[i][htn] in tag)) tag[info[i][htn]]=0;
-        if(!(info[i][atn] in tag)) tag[info[i][atn]]=0;
-        if(!(info[i][htn] in tp)) tp[info[i][htn]]=0;
-        if(!(info[i][atn] in tp)) tp[info[i][atn]]=0;
-        tag[info[i][htn]]= ((tp[info[i][htn]]*tag[info[i][htn]])+info[i][atg])/(tp[info[i][htn]]+1);
-        tag[info[i][atn]]= ((tp[info[i][atn]]*tag[info[i][atn]])+info[i][htg])/(tp[info[i][atn]]+1);
-        tp[info[i][htn]]++;
-        tp[info[i][atn]]++;
-        console.log(info[i][htn], tag[info[i][htn]], ":", tp[info[i][htn]], "  ", info[i][atn], tag[info[i][atn]], ":", tp[info[i][atn]]);
+    finalsArray.forEach(item => {
+        let team1 = item["Home Team Name"];
+        let team2 = item["Away Team Name"];
+        let goals1 = item["Home Team Goals"];
+        let goals2 = item["Away Team Goals"];
+        if(!(team1 in tg)) tg[team1]=0;
+        if(!(team2 in tg)) tg[team2]=0;
+        if(!(team1 in tp)) tp[team1]=0;
+        if(!(team2 in tp)) tp[team2]=0;
+        tg[team1]+=goals2;
+        tg[team2]+=goals1;
+        tp[team1]++;
+        tp[team2]++;
+        // console.log(team1, tg[team1], ":", tp[team1], "  ", team2, tg[team2], ":", tp[team2]);
+    });
+    // console.log(tg);
+    // console.log(tp);
+    const tag = {}; // Team Average Goals
+    for(const [key, value] of Object.entries(tg)){
+        tag[key]=value/tp[key];
     }
-    console.log(tag);
-    console.log(tp);
-    return Object.keys(tag).reduce((acc, key) => {if(tag[acc]>tag[key]) return acc; return key;}, "");
+    const highestValue = Math.max(...Object.values(tag));
+    // console.log(tag, highestValue);
+    return Object.keys(tag).filter(item => tag[item]===highestValue).join(" ");
 }
 
 console.log("Stretch 3:", badDefense(fifaData));
 
 /* If you still have time, use the space below to work on any stretch goals of your chosing as listed in the README file. */
+
 
 
 /* 🛑🛑🛑🛑🛑 Please do not modify anything below this line 🛑🛑🛑🛑🛑 */
