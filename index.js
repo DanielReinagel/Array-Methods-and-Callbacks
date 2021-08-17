@@ -28,8 +28,7 @@ hint - you should be looking at the stage key inside of the objects
 */
 
 function getFinals(data) {
-    const finalsArray = data.filter(item => item.Stage==="Final");
-    return finalsArray;
+    return data.filter(item => item.Stage==="Final");
 }
 
 console.log("task 2", getFinals(fifaData));
@@ -54,14 +53,13 @@ Use the higher-order function getWinners to do the following:
 4. Returns the names of all winning countries in an array called `winners` */ 
 
 function getWinners(data, getFinalscb) {
-    const winners = getFinalscb(data).map(function(item){
+    return getFinalscb(data).map(function(item){
         if(item["Home Team Goals"]>item["Away Team Goals"]){
             return item["Home Team Name"];
         } else {
             return item["Away Team Name"];
         }
     });
-    return winners;
 }
 
 console.log("task 4", getWinners(fifaData, getFinals));
@@ -112,31 +110,86 @@ Create a function called `getCountryWins` that takes the parameters `data` and `
 Hint: Investigate your data to find "team initials"!
 Hint: use `.reduce` */
 
-function getCountryWins(data, teamInitials) {
-    
+function getCountryWins(data, ti) { //ti=Team Initials
+    const htg = "Home Team Goals"; //short-handing
+    const atg = "Away Team Goals"; //^
+    const hti = "Home Team Initials"; //^
+    const ati = "Away Team Initials"; //^
+    return getFinals(data).reduce((acc, obj)=>{if((obj[hti]===ti&&obj[htg]>obj[atg])||(obj[ati]===ti&&obj[atg]>obj[htg])){return acc+1;}else{return acc;}}, 0); //adds 1 if the team with the Team Initials got more points
 }
 
+// function getCountryWins(data, teamInitials) {
+//     let wins = 0;
+//     const finalsArray = getFinals(data);
+//     for(let i=0;i<finalsArray.length;i++){
+//         if(finalsArray[i]["Home Team Initials"]===teamInitials&&finalsArray[i]["Home Team Goals"]>finalsArray[i]["Away Team Goals"]){
+//             wins++;
+//         } else if(finalsArray[i]["Home Team Initials"]===teamInitials&&finalsArray[i]["Home Team Goals"]<finalsArray[i]["Away Team Goals"]){
+//             wins++;
+//         }
+//     }
+//     return wins;
+// }
 
+console.log("Stretch 1", getCountryWins(fifaData, "ITA"));
 
 /* 💪💪💪💪💪 Stretch 2: 💪💪💪💪💪 
 Write a function called getGoals() that accepts a parameter `data` and returns the team with the most goals score per appearance (average goals for) in the World Cup finals */
 
-function getGoals(/* code here */) {
-
-    /* code here */
-
+function getGoals(data) {
+    const htn = "Home Team Name";
+    const atn = "Away Team Name";
+    const htg = "Home Team Goals";
+    const atg = "Away Team Goals";
+    const info = getFinals(data);
+    const tag = {}; //Team Average Goals
+    const tp = {}; //Team Played
+    for(let i=0;i<info.length;i++){
+        if(!(info[i][htn] in tag)) tag[info[i][htn]]=0;
+        if(!(info[i][atn] in tag)) tag[info[i][atn]]=0;
+        if(!(info[i][htn] in tp)) tp[info[i][htn]]=0;
+        if(!(info[i][atn] in tp)) tp[info[i][atn]]=0;
+        tag[info[i][htn]]= ((tp[info[i][htn]]*tag[info[i][htn]])+info[i][htg])/(tp[info[i][htn]]+1);
+        tag[info[i][atn]]= ((tp[info[i][atn]]*tag[info[i][atn]])+info[i][atg])/(tp[info[i][atn]]+1);
+        tp[info[i][htn]]++;
+        tp[info[i][atn]]++;
+        // console.log(tag[info[i][htn]], ":", tp[info[i][htn]], "  ", tag[info[i][atn]], ":", tp[info[i][atn]]);
+    }
+    // console.log(tag);
+    // console.log(tp);
+    return Object.keys(tag).reduce((acc, key) => {if(tag[acc]>tag[key]) return acc; return key;}, "");
 }
 
+console.log("Stretch 2:", getGoals(fifaData));
 
 /* 💪💪💪💪💪 Stretch 3: 💪💪💪💪💪
 Write a function called badDefense() that accepts a parameter `data` and calculates the team with the most goals scored against them per appearance (average goals against) in the World Cup finals */
 
-function badDefense(/* code here */) {
-
-    /* code here */
-
+function badDefense(data) {
+    const htn = "Home Team Name";
+    const atn = "Away Team Name";
+    const htg = "Home Team Goals";
+    const atg = "Away Team Goals";
+    const info = getFinals(data);
+    const tag = {}; //Team Average Goals Against Them
+    const tp = {}; //Team Played
+    for(let i=0;i<info.length;i++){
+        if(!(info[i][htn] in tag)) tag[info[i][htn]]=0;
+        if(!(info[i][atn] in tag)) tag[info[i][atn]]=0;
+        if(!(info[i][htn] in tp)) tp[info[i][htn]]=0;
+        if(!(info[i][atn] in tp)) tp[info[i][atn]]=0;
+        tag[info[i][htn]]= ((tp[info[i][htn]]*tag[info[i][htn]])+info[i][atg])/(tp[info[i][htn]]+1);
+        tag[info[i][atn]]= ((tp[info[i][atn]]*tag[info[i][atn]])+info[i][htg])/(tp[info[i][atn]]+1);
+        tp[info[i][htn]]++;
+        tp[info[i][atn]]++;
+        console.log(info[i][htn], tag[info[i][htn]], ":", tp[info[i][htn]], "  ", info[i][atn], tag[info[i][atn]], ":", tp[info[i][atn]]);
+    }
+    console.log(tag);
+    console.log(tp);
+    return Object.keys(tag).reduce((acc, key) => {if(tag[acc]>tag[key]) return acc; return key;}, "");
 }
 
+console.log("Stretch 3:", badDefense(fifaData));
 
 /* If you still have time, use the space below to work on any stretch goals of your chosing as listed in the README file. */
 
